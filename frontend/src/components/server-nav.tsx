@@ -1,9 +1,9 @@
 import {
   ActivityIcon,
-  MonitorIcon,
   Settings2Icon,
+  SquareTerminal,
   UploadIcon,
-  UsersIcon,
+  UserCheck,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -21,7 +21,7 @@ export function ServerNav() {
         href="#"
         className="flex items-center gap-3 rounded-lg px-3 py-2 text-zinc-400 hover:bg-zinc-800 hover:text-white"
       >
-        <MonitorIcon className="h-5 w-5" />
+        <SquareTerminal className="h-5 w-5" />
         <span>Console</span>
       </Link>
       <Link
@@ -42,7 +42,7 @@ export function ServerNav() {
         href="#"
         className="flex items-center gap-3 rounded-lg px-3 py-2 text-zinc-400 hover:bg-zinc-800 hover:text-white"
       >
-        <UsersIcon className="h-5 w-5" />
+        <UserCheck className="h-5 w-5" />
         <span>Whitelist</span>
       </Link>
     </nav>

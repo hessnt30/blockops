@@ -1,3 +1,4 @@
+import Login from "@/components/google-login";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import {
@@ -28,7 +29,7 @@ export default function LandingPage() {
               manage players, and configure your servers from anywhere, anytime.
             </p>
             <div className="mt-10 flex items-center justify-center gap-4">
-              <Link href={"/dashboard"}>
+              <Link href={"/servers"}>
                 <Button
                   size="lg"
                   className="bg-gradient-to-br from-purple-600 to-pink-600 hover:bg-purple-700"
@@ -36,13 +37,15 @@ export default function LandingPage() {
                   Get Started
                 </Button>
               </Link>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-zinc-800 bg-zinc-950"
-              >
-                Try for Free
-              </Button>
+              <Link href={"/login"}>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-zinc-800 bg-zinc-950"
+                >
+                  Try for Free
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="mt-16 flex justify-center">

@@ -6,11 +6,30 @@ interface SidebarNavProps {
   className?: string;
 }
 
+interface Server {
+  id: string;
+  name: string;
+  uuid: string;
+}
+
+const servers: Server[] = [
+  {
+    id: "1",
+    name: "minecraft 2025",
+    uuid: "123e4567-e89b-12d3-a456-426614174000",
+  },
+  {
+    id: "2",
+    name: "hypixel",
+    uuid: "987e6543-e21a-34c5-b678-526715283111",
+  },
+];
+
 export function SidebarNav({ className }: SidebarNavProps) {
   return (
     <nav className={cn("flex flex-col gap-1", className)}>
       <Link
-        href="#"
+        href="/"
         className="flex items-center gap-3 rounded-lg px-3 py-2 text-zinc-400 hover:bg-zinc-800 hover:text-white"
       >
         <AnchorIcon className="h-5 w-5" />
@@ -29,6 +48,14 @@ export function SidebarNav({ className }: SidebarNavProps) {
         <ServerIcon className="h-5 w-5" />
         <span>Servers</span>
       </Link>
+      {servers.map((server) => (
+        <Link
+          href={`/servers/${server.uuid}`}
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-zinc-400 ml-4 "
+        >
+          <span className="truncate">{server.name}</span>
+        </Link>
+      ))}
       <Link
         href="#"
         className="mt-auto flex items-center gap-3 rounded-lg px-3 py-2 text-zinc-400 hover:bg-zinc-800 hover:text-white"
