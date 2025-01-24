@@ -1,3 +1,6 @@
+"use client";
+
+import { useAuth } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 import { AnchorIcon, HomeIcon, ServerIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
@@ -26,6 +29,7 @@ const servers: Server[] = [
 ];
 
 export function SidebarNav({ className }: SidebarNavProps) {
+  const { user } = useAuth();
   return (
     <nav className={cn("flex flex-col gap-1", className)}>
       <Link
@@ -50,6 +54,7 @@ export function SidebarNav({ className }: SidebarNavProps) {
       </Link>
       {servers.map((server) => (
         <Link
+          key={server.id}
           href={`/servers/${server.uuid}`}
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-white text-zinc-400 ml-4 "
         >
@@ -61,7 +66,7 @@ export function SidebarNav({ className }: SidebarNavProps) {
         className="mt-auto flex items-center gap-3 rounded-lg px-3 py-2 text-zinc-400 hover:bg-zinc-800 hover:text-white"
       >
         <UserIcon className="h-5 w-5" />
-        <span>Profile</span>
+        <span>{user ? user.displayName : "Profile"}</span>
       </Link>
     </nav>
   );

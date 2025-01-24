@@ -1,27 +1,28 @@
 "use client";
 
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "@/firebase/config";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation"; // Use the router from Next.js
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/auth-context";
 import { CatIcon } from "lucide-react";
 
 function Login() {
-  const handleLogin = async () => {
-    try {
-      // Sign in using a popup.
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error(error);
+  const { logIn, user } = useAuth(); // Get the user and logIn from the context
+  const router = useRouter(); // Initialize the router
+
+  useEffect(() => {
+    // Redirect to "/servers" when a user is logged in
+    if (user) {
+      router.push("/servers");
     }
-  };
+  }, [user, router]); // Run the effect when `user` or `router` changes
 
   return (
     <Button
       size={"sm"}
       variant={"outline"}
       className="bg-zinc-900/50 border-zinc-800 text-white"
-      onClick={handleLogin}
+      onClick={logIn}
     >
       <CatIcon />
       Sign in with Google

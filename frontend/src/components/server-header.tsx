@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PlayCircle, StopCircle, RotateCw, UsersIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { stopServer, startServer } from "@/mc_api/api";
 
 export function ServerHeader() {
   const [usage, setUsage] = useState(0);
@@ -56,7 +57,8 @@ export function ServerHeader() {
           size="lg"
           variant="default"
           className="bg-gradient-to-br from-green-600 to-green-900"
-          disabled={isOnline}
+          disabled={!isOnline}
+          onClick={startServer}
         >
           <PlayCircle height={16} width={16} />
         </Button>
@@ -65,6 +67,7 @@ export function ServerHeader() {
           variant="default"
           className="bg-gradient-to-br from-red-600 to-red-900"
           disabled={!isOnline}
+          onClick={stopServer}
         >
           <StopCircle className="h-5 w-5" />
         </Button>
