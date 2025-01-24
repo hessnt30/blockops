@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthContextProvider } from "@/context/auth-context";
+import { LoadingContextProvider } from "@/context/loading-context";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { ThemeProvider } from "next-themes";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,13 +30,29 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <AuthContextProvider>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
         >
-          {children}
-        </body>
-      </AuthContextProvider>
+          <SidebarProvider>
+            <LoadingContextProvider>
+              <AuthContextProvider>
+                <AppSidebar />
+
+                <SidebarTrigger />
+                <main className="min-h-screen bg-background w-full">
+                  {children}
+                </main>
+              </AuthContextProvider>
+            </LoadingContextProvider>
+          </SidebarProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

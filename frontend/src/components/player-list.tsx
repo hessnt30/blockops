@@ -64,12 +64,12 @@ const players: Player[] = [
 
 export function PlayerList() {
   return (
-    <ScrollArea className="h-[400px] rounded-lg border border-zinc-800 bg-zinc-900/50">
+    <ScrollArea className="h-[400px] rounded-lg border">
       <div className="space-y-4 p-4">
         {players.map((player) => (
           <div
             key={player.id}
-            className="flex items-center justify-between gap-4 rounded-lg bg-zinc-800/50 p-3"
+            className="flex items-center justify-between gap-4 rounded-lg bg-background p-3"
           >
             <div className="flex items-center gap-3">
               <Image
@@ -80,8 +80,10 @@ export function PlayerList() {
                 // className="rounded bg-gradient-to-br from-purple-600 to-pink-600"
               />
               <div>
-                <div className="font-medium text-white">{player.name}</div>
-                <div className="text-xs text-zinc-400">{player.uuid}</div>
+                <div className="font-medium">{player.name}</div>
+                <div className="text-xs text-muted-foreground">
+                  {player.uuid}
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-2">
