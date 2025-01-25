@@ -9,14 +9,12 @@ app = Flask(__name__)
 @app.route('/server/check/health', methods=['GET'])
 def spark_healthreport():
     try:
-        # Send the "spark healthreport" command to the tmux session
         subprocess.run(["tmux", "send-keys", "-t", "minecraft", "spark healthreport", "Enter"])
 
         # Capture the tmux session's output
         result = subprocess.run(["tmux", "capture-pane", "-t", "minecraft", "-p"], stdout=subprocess.PIPE, text=True)
         output = result.stdout
 
-        # Initialize variables to store extracted data
         cpu_usage_10s = None
         memory_usage_percentage = None
 
@@ -28,22 +26,21 @@ def spark_healthreport():
                 # Extract the "process" line (next 2 lines include system and process usage)
                 process_line = lines[i + 2]
                 # Extract the last 10s percentage from the process line
-                cpu_usage_10s = process_line.split(",")[0].strip().split()[0]  # Extract the first percentage
+                cpu_usage_10s = int(process_line.split(",")[0].strip().split()[0])  # Extract the first percentage
             # Look for the Memory usage section
             elif "Memory usage:" in line:
                 # Extract the percentage from the memory usage line
                 memory_line = lines[i + 1].strip()
-                memory_usage_percentage = memory_line.split("(")[1].split("%")[0].strip()  # Extract the percentage
+                memory_usage_percentage = int(memory_line.split("(")[1].split("%")[0].strip())  # Extract the percentage
 
-        # Return the extracted data
+        # Return the extracted data as integers
         return jsonify({
             "healthreport": {
-                "cpu_usage_10s": f"{cpu_usage_10s}%",
-                "memory_usage": f"{memory_usage_percentage}%"
+                "cpu_usage_10s": cpu_usage_10s,
+                "memory_usage": memory_usage_percentage
             }
         }), 200
-
-        return jsonify({"healthreport": report}), 200
+    
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

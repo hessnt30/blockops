@@ -5,12 +5,17 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PlayCircle, StopCircle, RotateCw, UsersIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { stopServer, startServer } from "@/mc_api/api";
+import {
+  stopServer,
+  startServer,
+  checkHealth,
+  checkStatus,
+} from "@/mc_api/api";
 
 export function ServerHeader() {
   const [usage, setUsage] = useState(0);
   const [RAMUsage, setRAMUsage] = useState(0);
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(false);
 
   useEffect(() => {
     const generateRandomValue = () => {
