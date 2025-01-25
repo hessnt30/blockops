@@ -29,17 +29,17 @@ export function ServerHeader() {
   }, []);
 
   return (
-    <Card className="flex items-center gap-4 p-4 bg-zinc-900/50 border-zinc-900 justify-between">
+    <Card className="flex items-center gap-4 p-4 justify-between">
       {/* Server Info */}
       <div className="flex flex-row gap-4 items-center">
         <div className="rounded bg-gradient-to-br from-purple-600 to-pink-600 w-24 h-24" />
         <div className="flex">
           <div className="flex gap-4 flex-col">
-            <h1 className="text-xl font-semibold text-white">minecraft 2025</h1>
+            <h1 className="text-xl font-semibold">minecraft 2025</h1>
             <div className="flex flex-row">
               <div className="flex items-center gap-2 text-sm">
-                <UsersIcon className="text-zinc-400" />
-                <span className="text-zinc-400">5/20</span>
+                <UsersIcon className="text-muted-foreground" />
+                <span className="text-muted-foreground">5/20</span>
               </div>
               <div className="flex items-center ml-4 gap-2 text-sm">
                 <div className="border rounded-full px-2 py-1 bg-green-600 border-green-600">
@@ -60,7 +60,7 @@ export function ServerHeader() {
           disabled={!isOnline}
           onClick={startServer}
         >
-          <PlayCircle height={16} width={16} />
+          <PlayCircle className="text-white" height={16} width={16} />
         </Button>
         <Button
           size="lg"
@@ -69,7 +69,7 @@ export function ServerHeader() {
           disabled={!isOnline}
           onClick={stopServer}
         >
-          <StopCircle className="h-5 w-5" />
+          <StopCircle className="text-white h-5 w-5" />
         </Button>
         <Button
           size="lg"
@@ -77,23 +77,23 @@ export function ServerHeader() {
           className="bg-gradient-to-br from-blue-600 to-blue-900"
           disabled={!isOnline}
         >
-          <RotateCw className="h-5 w-5" />
+          <RotateCw className="text-white h-5 w-5" />
         </Button>
       </div>
       <div className="flex items-center gap-4 min-w-[400px]">
         <div className="space-y-1 flex-1">
           <div className="flex justify-between text-sm">
-            <span className="text-zinc-400">CPU Usage</span>
-            <span className="text-zinc-400">{usage}%</span>
+            <span className="text-muted-foreground">CPU Usage</span>
+            <span className="text-muted-foreground">{usage}%</span>
           </div>
-          <Progress value={usage} className="h-2 bg-zinc-800" />
+          <Progress value={usage} className="h-2 bg-input" />
         </div>
         <div className="space-y-1 flex-1">
           <div className="flex justify-between text-sm">
-            <span className="text-zinc-400">RAM Usage</span>
-            <span className="text-zinc-400">{RAMUsage}%</span>
+            <span className="text-muted-foreground">RAM Usage</span>
+            <span className="text-muted-foreground">{RAMUsage}%</span>
           </div>
-          <Progress value={RAMUsage} className="h-2 bg-zinc-800" />
+          <Progress value={RAMUsage} className="h-2 bg-input" />
         </div>
       </div>
     </Card>
