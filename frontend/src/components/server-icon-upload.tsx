@@ -14,7 +14,7 @@ export default function IconUpload() {
           <Input id="picture" type="file" />
         </div>
 
-        <Button type="submit">Subscribe</Button>
+        <Button type="submit">Upload</Button>
       </div>
 
       <div className="mt-4">

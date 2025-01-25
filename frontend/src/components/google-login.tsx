@@ -18,12 +18,7 @@ function Login() {
   }, [user, router]); // Run the effect when `user` or `router` changes
 
   return (
-    <Button
-      size={"sm"}
-      variant={"outline"}
-      className="bg-zinc-900/50 border-zinc-800 text-white"
-      onClick={logIn}
-    >
+    <Button size={"lg"} onClick={logIn}>
       <CatIcon />
       Sign in with Google
     </Button>

@@ -9,16 +9,16 @@ import Login from "@/components/google-login";
 
 function LoginPage() {
   return (
-    <div className="flex min-h-screen bg-zinc-950 justify-center items-center text-white max-w-7xl">
-      <Card className="bg-zinc-900/50 border-zinc-800">
-        <CardHeader className="text-white">
+    <div className="flex min-h-screen justify-center items-center w-full p-6">
+      <Card>
+        <CardHeader>
           <CardTitle>Sign In to BlockOps</CardTitle>
         </CardHeader>
-        <CardContent className="text-white max-w-md">
+        <CardContent className="max-w-md">
           BlockOps requires you to sign in to save your information regarding
           your Minecraft servers.
         </CardContent>
-        <CardFooter className="flex">
+        <CardFooter className="flex justify-end">
           <Login />
         </CardFooter>
       </Card>
