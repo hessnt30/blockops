@@ -11,31 +11,37 @@ def spark_healthreport():
     try:
         # Send the "spark healthreport" command to the tmux session
         subprocess.run(["tmux", "send-keys", "-t", "minecraft", "spark healthreport", "Enter"])
-        
-        # Allow some time for the server to generate the output
-        subprocess.run(["sleep", "2"])
 
         # Capture the tmux session's output
         result = subprocess.run(["tmux", "capture-pane", "-t", "minecraft", "-p"], stdout=subprocess.PIPE, text=True)
         output = result.stdout
 
-        # Extract relevant sections from the output
-        report = {}
-        lines = output.split("\n")
+        # Initialize variables to store extracted data
+        cpu_usage_10s = None
+        memory_usage_percentage = None
 
+        # Process each line of the output
+        lines = output.split("\n")
         for i, line in enumerate(lines):
-            if "TPS from last" in line:
-                report['tps'] = lines[i + 1].strip()
-            elif "Tick durations" in line:
-                report['tick_durations'] = lines[i + 1].strip()
-            elif "CPU usage from last" in line:
-                report['cpu_usage'] = lines[i + 1:i + 3]
+            # Look for the CPU usage section
+            if "CPU usage from last" in line:
+                # Extract the "process" line (next 2 lines include system and process usage)
+                process_line = lines[i + 2]
+                # Extract the last 10s percentage from the process line
+                cpu_usage_10s = process_line.split(",")[0].strip().split()[0]  # Extract the first percentage
+            # Look for the Memory usage section
             elif "Memory usage:" in line:
-                report['memory_usage'] = lines[i + 1].strip()
-            elif "Network usage:" in line:
-                report['network_usage'] = lines[i + 1:i + 5]
-            elif "Disk usage:" in line:
-                report['disk_usage'] = lines[i + 1].strip()
+                # Extract the percentage from the memory usage line
+                memory_line = lines[i + 1].strip()
+                memory_usage_percentage = memory_line.split("(")[1].split("%")[0].strip()  # Extract the percentage
+
+        # Return the extracted data
+        return jsonify({
+            "healthreport": {
+                "cpu_usage_10s": f"{cpu_usage_10s}%",
+                "memory_usage": f"{memory_usage_percentage}%"
+            }
+        }), 200
 
         return jsonify({"healthreport": report}), 200
     except Exception as e:
