@@ -6,7 +6,7 @@ import time
 app = Flask(__name__)
 
 # Run the spark healthreport command
-@app.route('/server/healthreport', methods=['GET'])
+@app.route('/server/check/health', methods=['GET'])
 def spark_healthreport():
     try:
         # Send the "spark healthreport" command to the tmux session
@@ -43,7 +43,7 @@ def spark_healthreport():
 
 
 # Start the Minecraft server
-@app.route('/server/start', methods=['POST'])
+@app.route('/server/action/start', methods=['POST'])
 def start_server():
     try:
         # Start the server in a tmux session
@@ -52,7 +52,7 @@ def start_server():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/stop', methods=['POST'])
+@app.route('/server/action/stop', methods=['POST'])
 def stop_server():
     try:
         # Check if the tmux session exists
@@ -78,7 +78,7 @@ def stop_server():
         return jsonify({"status": "Failed to stop server.", "error": str(e)}), 500
 
 # Check server status
-@app.route('/server/status', methods=['GET'])
+@app.route('/server/check/status', methods=['GET'])
 def server_status():
     try:
         result = subprocess.run(["tmux", "has-session", "-t", "minecraft"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
