@@ -18,15 +18,12 @@ export function ServerHeader() {
   const [isOnline, setIsOnline] = useState(false);
 
   useEffect(() => {
-    const generateRandomValue = () => {
-      let val = Math.random();
-      let val2 = Math.random();
+    const generateRandomValue = async () => {
+      const healthReport = await checkHealth();
+      console.log(healthReport);
 
-      val *= 100;
-      val2 *= 100;
-
-      setUsage(parseInt(val.toFixed(1)));
-      setRAMUsage(parseInt(val2.toFixed(1)));
+      setUsage(healthReport.healthreport.cpu_usage_10s);
+      setRAMUsage(healthReport.healthreport.memory_usage);
     };
     const intervalId = setInterval(generateRandomValue, 3000);
 

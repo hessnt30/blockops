@@ -21,9 +21,8 @@ export const stopServer = async () => {
 
 export const checkHealth = async () => {
   try {
-    await axios.get("http://10.0.0.198:5000/check/health").then((result) => {
-      return result;
-    });
+    const result = await axios.get("http://10.0.0.198:5000/server/check/health");
+    return result.data;
   } catch (e) {
     console.error("Failed to get health report", e);
   }
@@ -31,9 +30,8 @@ export const checkHealth = async () => {
 
 export const checkStatus = async () => {
   try {
-    await axios.get("http://10.0.0.198:5000/check/status").then((result) => {
-      return result;
-    });
+    const result = await axios.get("http://10.0.0.198:5000/server/check/status");
+    return result.data;
   } catch (e) {
     console.error("Failed to check status");
   }

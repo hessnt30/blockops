@@ -5,44 +5,39 @@ import time
 
 app = Flask(__name__)
 
-# Run the spark healthreport command
 @app.route('/server/check/health', methods=['GET'])
 def spark_healthreport():
     try:
+        # Send the "spark healthreport" command to the tmux session
         subprocess.run(["tmux", "send-keys", "-t", "minecraft", "spark healthreport", "Enter"])
 
         # Capture the tmux session's output
         result = subprocess.run(["tmux", "capture-pane", "-t", "minecraft", "-p"], stdout=subprocess.PIPE, text=True)
         output = result.stdout
 
-        cpu_usage_10s = None
-        memory_usage_percentage = None
-
-        # Process each line of the output
+        # Extract relevant sections from the output
+        report = {}
         lines = output.split("\n")
-        for i, line in enumerate(lines):
-            # Look for the CPU usage section
-            if "CPU usage from last" in line:
-                # Extract the "process" line (next 2 lines include system and process usage)
-                process_line = lines[i + 2]
-                # Extract the last 10s percentage from the process line
-                cpu_usage_10s = int(process_line.split(",")[0].strip().split()[0])  # Extract the first percentage
-            # Look for the Memory usage section
-            elif "Memory usage:" in line:
-                # Extract the percentage from the memory usage line
-                memory_line = lines[i + 1].strip()
-                memory_usage_percentage = int(memory_line.split("(")[1].split("%")[0].strip())  # Extract the percentage
 
-        # Return the extracted data as integers
-        return jsonify({
-            "healthreport": {
-                "cpu_usage_10s": cpu_usage_10s,
-                "memory_usage": memory_usage_percentage
-            }
-        }), 200
-    
+        for i, line in enumerate(lines):
+            if "CPU usage from last" in line:
+                # Extract the "process" line
+                process_line = lines[i + 2]
+                # Extract the percentage from the process line
+                process_percentage = process_line.split(',')[0].strip().replace('%', '')
+                report['cpu_usage'] = int(process_percentage)
+
+            elif "Memory usage:" in line:
+                # Extract the memory usage percentage
+                memory_line = lines[i + 1].strip()
+                memory_percentage = memory_line.split('(')[1].split('%')[0].strip()
+                report['memory_usage'] = int(memory_percentage)
+
+        return jsonify({"healthreport": report}), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 
 # Start the Minecraft server
