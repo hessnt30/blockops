@@ -96,57 +96,58 @@ def player_list():
 
         # Capture the tmux pane output
         result = subprocess.run(["tmux", "capture-pane", "-t", "minecraft", "-p"], stdout=subprocess.PIPE, text=True)
-        output = result.stdout.strip()  # Remove unnecessary whitespace
+        output = result.stdout.strip()  # Clean up whitespace
 
         # Log the raw output for debugging
         print(f"Captured output: {output}")
 
-        # Process the output to find the relevant line
-        lines = output.splitlines()
-        player_info_line = None
+        # Split the output into lines and reverse for recent entries
+        lines = output.splitlines()[::-1]  # Process lines from the most recent
 
+        # Find the most recent "list" response
+        player_info_line = None
         for line in lines:
             if "players online" in line:
                 player_info_line = line.strip()
                 break
 
         if not player_info_line:
-            # Return an empty response if no player info is found
+            # If no relevant line is found, return empty response
             return jsonify({"players": {"max_players": 0, "num_players_online": 0, "player_names": []}}), 200
 
-        # Split the relevant line by colon
+        # Parse the line into counts and player names
         parts = player_info_line.split(":")
         if len(parts) < 2:
-            # If there's no colon, assume no player names are provided
+            # No player names provided
             return jsonify({"players": {"max_players": 0, "num_players_online": 0, "player_names": []}}), 200
 
-        # Extract the counts and player names
-        player_count_part = parts[0].strip()  # The part before the colon contains counts
-        player_names_part = parts[1].strip()  # The part after the colon contains names
+        # Extract counts and player names
+        count_part = parts[0]
+        names_part = parts[1].strip()
 
-        # Extract player counts
-        count_words = player_count_part.split()
-        if len(count_words) < 7:
-            # If the count part is malformed, return an empty response
-            return jsonify({"players": {"max_players": 0, "num_players_online": 0, "player_names": []}}), 200
-
+        # Parse counts
+        count_words = count_part.split()
         num_players_online = int(count_words[2])  # "There are X ..."
         max_players = int(count_words[6])  # "... of a max of Y ..."
 
-        # Extract player names as a list
-        player_names = [name.strip() for name in player_names_part.split(",")] if player_names_part else []
+        # Parse player names
+        player_names = [name.strip() for name in names_part.split(",")] if names_part else []
 
-        # Create the response
-        resp = {
-            "num_players_online": num_players_online,
-            "max_players": max_players,
-            "player_names": player_names,
+        # Create response
+        response = {
+            "players": {
+                "num_players_online": num_players_online,
+                "max_players": max_players,
+                "player_names": player_names,
+            }
         }
 
-        return jsonify({"players": resp}), 200
+        return jsonify(response), 200
 
     except Exception as e:
+        # Catch all exceptions and return error details
         return jsonify({"error": str(e)}), 500
+
 
 
 if __name__ == '__main__':
