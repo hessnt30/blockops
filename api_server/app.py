@@ -87,11 +87,6 @@ def server_status():
             return jsonify({"status": "stopped"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
-import subprocess
-from flask import Flask, jsonify
-
-app = Flask(__name__)
 
 @app.route('/server/check/player-list', methods=['GET'])
 def player_list():
@@ -119,15 +114,24 @@ def player_list():
             # Return an empty response if no player info is found
             return jsonify({"players": {"max_players": 0, "num_players_online": 0, "player_names": []}}), 200
 
-        # Parse the relevant line
-        parts = player_info_line.split(":")  # Split by colon to separate the player names
-        player_count_part = parts[0]  # The part before the colon contains counts
-        player_names_part = parts[1] if len(parts) > 1 else ""  # The part after the colon contains names
+        # Split the relevant line by colon
+        parts = player_info_line.split(":")
+        if len(parts) < 2:
+            # If there's no colon, assume no player names are provided
+            return jsonify({"players": {"max_players": 0, "num_players_online": 0, "player_names": []}}), 200
+
+        # Extract the counts and player names
+        player_count_part = parts[0].strip()  # The part before the colon contains counts
+        player_names_part = parts[1].strip()  # The part after the colon contains names
 
         # Extract player counts
-        count_parts = player_count_part.split()
-        num_players_online = int(count_parts[2])  # "There are X ..."
-        max_players = int(count_parts[6])  # "... of a max of Y ..."
+        count_words = player_count_part.split()
+        if len(count_words) < 7:
+            # If the count part is malformed, return an empty response
+            return jsonify({"players": {"max_players": 0, "num_players_online": 0, "player_names": []}}), 200
+
+        num_players_online = int(count_words[2])  # "There are X ..."
+        max_players = int(count_words[6])  # "... of a max of Y ..."
 
         # Extract player names as a list
         player_names = [name.strip() for name in player_names_part.split(",")] if player_names_part else []
