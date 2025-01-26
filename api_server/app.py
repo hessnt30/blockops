@@ -88,35 +88,62 @@ def server_status():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+import subprocess
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
 @app.route('/server/check/player-list', methods=['GET'])
 def player_list():
     try:
+        # Send the "list" command to the Minecraft server tmux session
         subprocess.run(["tmux", "send-keys", "-t", "minecraft", "list", "ENTER"])
 
+        # Capture the tmux pane output
         result = subprocess.run(["tmux", "capture-pane", "-t", "minecraft", "-p"], stdout=subprocess.PIPE, text=True)
-        output = result.stdout.strip()
+        output = result.stdout.strip()  # Remove unnecessary whitespace
 
+        # Log the raw output for debugging
+        print(f"Captured output: {output}")
+
+        # Process the output to find the relevant line
+        lines = output.splitlines()
+        player_info_line = None
+
+        for line in lines:
+            if "players online" in line:
+                player_info_line = line.strip()
+                break
+
+        if not player_info_line:
+            # Return an empty response if no player info is found
+            return jsonify({"players": {"max_players": 0, "num_players_online": 0, "player_names": []}}), 200
+
+        # Parse the relevant line
+        parts = player_info_line.split(":")  # Split by colon to separate the player names
+        player_count_part = parts[0]  # The part before the colon contains counts
+        player_names_part = parts[1] if len(parts) > 1 else ""  # The part after the colon contains names
+
+        # Extract player counts
+        count_parts = player_count_part.split()
+        num_players_online = int(count_parts[2])  # "There are X ..."
+        max_players = int(count_parts[6])  # "... of a max of Y ..."
+
+        # Extract player names as a list
+        player_names = [name.strip() for name in player_names_part.split(",")] if player_names_part else []
+
+        # Create the response
         resp = {
-            "num_players_online": 0,
-            "max_players": 0,
-            "player_names": []
+            "num_players_online": num_players_online,
+            "max_players": max_players,
+            "player_names": player_names,
         }
-
-        # Match the output with the regex
-        match = re.search(r"There are (\d+) of a max of (\d+) players online:?(.*)", output)
-
-        if match:
-            resp["num_players_online"] = int(match.group(1))
-            resp["max_players"] = int(match.group(2))
-
-            player_names = match.group(3).strip()
-            if player_names:
-                resp["player_names"] = [name.strip() for name in player_names.split(",")]
 
         return jsonify({"players": resp}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

@@ -10,6 +10,7 @@ import {
   startServer,
   checkHealth,
   checkStatus,
+  getPlayers,
 } from "@/mc_api/api";
 import { Badge } from "@/components/ui/badge";
 
@@ -31,19 +32,22 @@ export function ServerHeader() {
       setRAMUsage(healthReport.healthreport.memory_usage);
     };
 
-    if (!pauseHealth && isOnline) {
-      const intervalId = setInterval(getHealthReport, 3000);
+    // if (!pauseHealth && isOnline) {
+    //   const intervalId = setInterval(getHealthReport, 3000);
 
-      console.log("ENTERED LOL");
+    //   console.log("ENTERED LOL");
 
-      return () => clearInterval(intervalId);
-    }
+    //   return () => clearInterval(intervalId);
+    // }
   }, [isOnline, pauseHealth]);
 
   useEffect(() => {
     const getStatus = async () => {
       const status = await checkStatus();
       console.log(status);
+
+      const players = await getPlayers();
+      console.log("players: ", players);
 
       setIsOnline(status.status === "running");
     };
