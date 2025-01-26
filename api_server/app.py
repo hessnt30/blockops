@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 import os
 import subprocess
 import time
+import re
 
 app = Flask(__name__)
 
@@ -84,6 +85,36 @@ def server_status():
             return jsonify({"status": "running"}), 200
         else:
             return jsonify({"status": "stopped"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/server/check/player-list', methods=['GET'])
+def player_list():
+    try:
+        subprocess.run(["tmux", "send-keys", "-t", "minecraft", "list", "ENTER"])
+
+        result = subprocess.run(["tmux", "capture-pane", "-t", "minecraft", "-p"], stdout=subprocess.PIPE, text=True)
+        output = result.stdout.strip()
+
+        resp = {
+            "num_players_online": 0,
+            "max_players": 0,
+            "player_names": []
+        }
+
+        # Match the output with the regex
+        match = re.search(r"There are (\d+) of a max of (\d+) players online:?(.*)", output)
+
+        if match:
+            resp["num_players_online"] = int(match.group(1))
+            resp["max_players"] = int(match.group(2))
+
+            player_names = match.group(3).strip()
+            if player_names:
+                resp["player_names"] = [name.strip() for name in player_names.split(",")]
+
+        return jsonify({"players": resp}), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

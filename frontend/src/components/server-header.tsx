@@ -11,24 +11,64 @@ import {
   checkHealth,
   checkStatus,
 } from "@/mc_api/api";
+import { Badge } from "@/components/ui/badge";
+
+const offlineStyles = "bg-red-600 text-white";
+const onlineStyles = "bg-green-600 text-white";
 
 export function ServerHeader() {
   const [usage, setUsage] = useState(0);
   const [RAMUsage, setRAMUsage] = useState(0);
   const [isOnline, setIsOnline] = useState(false);
+  const [pauseHealth, setPauseHealth] = useState(false);
 
   useEffect(() => {
-    const generateRandomValue = async () => {
+    const getHealthReport = async () => {
       const healthReport = await checkHealth();
       console.log(healthReport);
 
-      setUsage(healthReport.healthreport.cpu_usage_10s);
+      setUsage(healthReport.healthreport.cpu_usage);
       setRAMUsage(healthReport.healthreport.memory_usage);
     };
-    const intervalId = setInterval(generateRandomValue, 3000);
 
-    return () => clearInterval(intervalId);
+    if (!pauseHealth && isOnline) {
+      const intervalId = setInterval(getHealthReport, 3000);
+
+      console.log("ENTERED LOL");
+
+      return () => clearInterval(intervalId);
+    }
+  }, [isOnline, pauseHealth]);
+
+  useEffect(() => {
+    const getStatus = async () => {
+      const status = await checkStatus();
+      console.log(status);
+
+      setIsOnline(status.status === "running");
+    };
+
+    getStatus();
+    // const intervalId = setInterval(getStatus, 3000);
+
+    // return () => clearInterval(intervalId);
   }, []);
+
+  const handleStart = () => {
+    startServer();
+    setIsOnline(true);
+    setPauseHealth(true);
+    setTimeout(() => {
+      setPauseHealth(false);
+    }, 20000);
+  };
+
+  const handleStop = () => {
+    stopServer();
+    setIsOnline(false);
+    setRAMUsage(0);
+    setUsage(0);
+  };
 
   return (
     <Card className="flex items-center gap-4 p-4 justify-between">
@@ -44,9 +84,9 @@ export function ServerHeader() {
                 <span className="text-muted-foreground">5/20</span>
               </div>
               <div className="flex items-center ml-4 gap-2 text-sm">
-                <div className="border rounded-full px-2 py-1 bg-green-600 border-green-600">
-                  <span className="text-white">Online</span>
-                </div>
+                <Badge className={isOnline ? onlineStyles : offlineStyles}>
+                  {isOnline ? "Online" : "Offline"}
+                </Badge>
               </div>
             </div>
           </div>
@@ -59,8 +99,8 @@ export function ServerHeader() {
           size="lg"
           variant="default"
           className="bg-gradient-to-br from-green-600 to-green-900"
-          disabled={!isOnline}
-          onClick={startServer}
+          disabled={isOnline}
+          onClick={() => handleStart()}
         >
           <PlayCircle className="text-white" height={16} width={16} />
         </Button>
@@ -69,7 +109,7 @@ export function ServerHeader() {
           variant="default"
           className="bg-gradient-to-br from-red-600 to-red-900"
           disabled={!isOnline}
-          onClick={stopServer}
+          onClick={() => handleStop()}
         >
           <StopCircle className="text-white h-5 w-5" />
         </Button>
